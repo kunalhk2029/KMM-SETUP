@@ -20,7 +20,7 @@ object ModifierExtensionUtils {
                 onClick.invoke()
             }
         }
-        return this.clickable() {
+        return this.clickable {
             onClick.invoke()
         }
     }

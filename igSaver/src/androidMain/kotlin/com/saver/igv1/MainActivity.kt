@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity(), AndroidPlatformSpecificMethods {
         }
     }
 
+
     override fun StartLoginActivity() {
         val intent = Intent(this, AuthenticationActivity::class.java)
         startActivity(intent)
@@ -51,6 +52,12 @@ class MainActivity : ComponentActivity(), AndroidPlatformSpecificMethods {
         super.onDestroy()
         mediaPlayerProgressManager.destroyAll()
     }
+
+
+    fun g(){
+
+    }
+
 }
 
 @Preview
