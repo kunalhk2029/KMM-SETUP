@@ -1,0 +1,119 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "e139eeb88708e7f6d2aa6a315a7fc4ba",
+    "entities": [
+      {
+        "tableName": "stories_tray_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `rankedPosition` INTEGER, `seenRankedPosition` INTEGER, `user` TEXT, `mediaCount` INTEGER, `latestReelTime` INTEGER, `seenByUser` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rankedPosition",
+            "columnName": "rankedPosition",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "seenRankedPosition",
+            "columnName": "seenRankedPosition",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "user",
+            "columnName": "user",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mediaCount",
+            "columnName": "mediaCount",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "latestReelTime",
+            "columnName": "latestReelTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "seenByUser",
+            "columnName": "seenByUser",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "story_media_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `isVideo` INTEGER, `mediaTakenAtTimeStamp` INTEGER, `imageMediaData` TEXT, `videoMediaData` TEXT, `isStoryMediaSeen` INTEGER, `storyTouchInteractionsMetaData` TEXT, `user` TEXT, `videoDuration` REAL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isVideo",
+            "columnName": "isVideo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mediaTakenAtTimeStamp",
+            "columnName": "mediaTakenAtTimeStamp",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "imageMediaData",
+            "columnName": "imageMediaData",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "videoMediaData",
+            "columnName": "videoMediaData",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isStoryMediaSeen",
+            "columnName": "isStoryMediaSeen",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "storyTouchInteractionsMetaData",
+            "columnName": "storyTouchInteractionsMetaData",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "user",
+            "columnName": "user",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "videoDuration",
+            "columnName": "videoDuration",
+            "affinity": "REAL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e139eeb88708e7f6d2aa6a315a7fc4ba')"
+    ]
+  }
+}
