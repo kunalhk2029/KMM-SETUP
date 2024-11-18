@@ -13,6 +13,13 @@ class InstagramAuthSessionManager(private val sharedPrefRepository: SharedPrefRe
         return sessionid
     }
 
+    fun getCsrfToken(): String? {
+        val csrfToken = sharedPrefRepository.getCsrfToken()
+        Logger.log("5646464 getCsrfToken // $csrfToken")
+        return csrfToken
+    }
+
+
     fun getRequestHeadersMap(): HashMap<String, String?> {
         val sessionid = sharedPrefRepository.getSessionId()
         val csrfToken = sharedPrefRepository.getCsrfToken()

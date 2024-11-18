@@ -1,6 +1,7 @@
 package com.saver.igv1.business.data.prefs
 
 import com.saver.igv1.business.domain.DownloadingLocationOptions
+import com.saver.igv1.business.domain.models.ig_user.InstagramUser
 
 interface SharedPrefRepository {
 
@@ -180,7 +181,10 @@ interface SharedPrefRepository {
 
     fun set_DOWNLOADING_OPTION(downloadingLocationOptions: DownloadingLocationOptions)
 
-    fun ACTIVE_PROFILE_USERNAME(username: String?): String?
+    fun getLoggedInUsername(): String?
+    fun setLoggedInUsername(
+        userName: String?
+    )
 
     fun APP_OPENED_TIME(time: Long?): Long
 

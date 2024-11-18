@@ -59,7 +59,7 @@ class AuthenticationActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefresh
 //            appDao.deleteLiveStoriesData()
 //            appDao.deleteAllIndividualHighlights()
 //            appDao.deleteunSeenStories()
-            sharedPrefRepository.ACTIVE_PROFILE_USERNAME(null)
+            sharedPrefRepository.setLoggedInUsername(null)
             sharedPrefRepository.APP_OPENED_TIME(0L)
             com.saver.igv1.Logger.log("Debug 8929 logout clearing worker cleared entities..........")
         }

@@ -8,6 +8,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.saver.igv1.AndroidVersion.isVersionAbove29
 import com.saver.igv1.business.data.app_storage.external.utils.storeMediaFromByteArray
+import com.saver.igv1.business.data.prefs.SharedPrefRepository
 import com.saver.igv1.business.domain.DataState
 import com.saver.igv1.business.domain.UIComponent
 import com.saver.igv1.business.domain.models.stories.StoryMediaInfo
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 
 actual class StoriesExternalStorageServiceImpl(
-    private val contentResolver: ContentResolver
+    private val contentResolver: ContentResolver,
+    val sharedPrefRepository: SharedPrefRepository
 ) : StoriesExternalStorageService {
 
     override suspend fun saveStory(
@@ -26,73 +28,79 @@ actual class StoriesExternalStorageServiceImpl(
         var uri: Uri?
         val username = storyMediaInfo.user?.username ?: ""
         val fullname = storyMediaInfo.user?.full_name ?: ""
+        val rootDirectory =
+            if (sharedPrefRepository.getLoggedInUsername() == null)
+                StorageDirectoryConstants.MAIN_DIRECTORY
+            else
+                "${StorageDirectoryConstants.MAIN_DIRECTORY}/${sharedPrefRepository.getLoggedInUsername()}"
+
         println("677688 username: $username")
         println("677688 fullname: $fullname")
 //        if (isVersionAbove29()) {
-            ContentValues().apply {
-                put(
+        ContentValues().apply {
+            put(
+                if (storyMediaInfo.isVideo == true)
+                    MediaStore.Video.Media.DISPLAY_NAME else MediaStore.Images.Media.DISPLAY_NAME,
+                "$username##${storyMediaInfo.mediaTakenAtTimeStamp}##"
+            )
+            put(
+                if (storyMediaInfo.isVideo == true)
+                    MediaStore.Video.Media.MIME_TYPE else MediaStore.Images.Media.MIME_TYPE,
+                if (storyMediaInfo.isVideo == true)
+                    "video/mp4" else "image/jpeg"
+            )
+            put(
+                if (storyMediaInfo.isVideo == true)
+                    MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH,
+                (if (storyMediaInfo.isVideo == true)
+                    Environment.DIRECTORY_MOVIES
+                else Environment.DIRECTORY_PICTURES) + "/${rootDirectory}/${StorageDirectoryConstants.STORIES_DIRECTORY}/$username/$fullname"
+            )
+            uri = contentResolver.insert(
+                if (isVersionAbove29())
                     if (storyMediaInfo.isVideo == true)
-                        MediaStore.Video.Media.DISPLAY_NAME else MediaStore.Images.Media.DISPLAY_NAME,
-                    "$username##${storyMediaInfo.mediaTakenAtTimeStamp}##"
-                )
-                put(
-                    if (storyMediaInfo.isVideo == true)
-                        MediaStore.Video.Media.MIME_TYPE else MediaStore.Images.Media.MIME_TYPE,
-                    if (storyMediaInfo.isVideo == true)
-                        "video/mp4" else "image/jpeg"
-                )
-                put(
-                    if (storyMediaInfo.isVideo == true)
-                        MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH,
-                    (if (storyMediaInfo.isVideo == true)
-                        Environment.DIRECTORY_MOVIES
-                    else Environment.DIRECTORY_PICTURES) + "/${StorageDirectoryConstants.MAIN_DIRECTORY}/${StorageDirectoryConstants.STORIES_DIRECTORY}/$username/$fullname"
-                )
-                uri = contentResolver.insert(
-                    if (isVersionAbove29())
-                        if (storyMediaInfo.isVideo == true)
-                            MediaStore.Video.Media.getContentUri(
-                                MediaStore.VOLUME_EXTERNAL_PRIMARY
-                            ) else MediaStore.Images.Media.getContentUri(
+                        MediaStore.Video.Media.getContentUri(
                             MediaStore.VOLUME_EXTERNAL_PRIMARY
-                        )
-                    else MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    this
-                )
-            }
+                        ) else MediaStore.Images.Media.getContentUri(
+                        MediaStore.VOLUME_EXTERNAL_PRIMARY
+                    )
+                else MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                this
+            )
+        }
 
-            if (uri == null) {
-                send(DataState.Response(UIComponent.Dialog("Failed", "Failed to save story")))
-            } else {
-                contentResolver.openOutputStream(uri!!).use {
-                    if (it != null) {
-                        storeMediaFromByteArray(it, byteArray).let {
-                            if (it) {
-                                send(DataState.Data(uri.toString()))
-                            } else {
-                                send(
-                                    DataState.Response(
-                                        UIComponent.Dialog(
-                                            "Failed",
-                                            "Failed to save story"
-                                        )
+        if (uri == null) {
+            send(DataState.Response(UIComponent.Dialog("Failed", "Failed to save story")))
+        } else {
+            contentResolver.openOutputStream(uri!!).use {
+                if (it != null) {
+                    storeMediaFromByteArray(it, byteArray).let {
+                        if (it) {
+                            send(DataState.Data(uri.toString()))
+                        } else {
+                            send(
+                                DataState.Response(
+                                    UIComponent.Dialog(
+                                        "Failed",
+                                        "Failed to save story"
                                     )
                                 )
-                            }
+                            )
                         }
-                    } else {
-                        contentResolver.delete(uri!!, null, null)
-                        send(
-                            DataState.Response(
-                                UIComponent.Dialog(
-                                    "Failed",
-                                    "Failed to save story"
-                                )
+                    }
+                } else {
+                    contentResolver.delete(uri!!, null, null)
+                    send(
+                        DataState.Response(
+                            UIComponent.Dialog(
+                                "Failed",
+                                "Failed to save story"
                             )
                         )
-                    }
+                    )
                 }
             }
+        }
 //        }
 //        else {
 //            var ext = ".jpg"

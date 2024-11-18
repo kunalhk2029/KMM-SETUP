@@ -340,9 +340,7 @@ class SharedPrefRepositoryImpl(private val pref: SharedPrefs) : SharedPrefReposi
     }
 
     override fun setLoginInActiveTrackerLoggerTime(lastLoggedTime: Long) {
-
         pref.putLong("TrackerLoggerTime", lastLoggedTime)
-
     }
     ///////////////////////
 
@@ -387,9 +385,7 @@ class SharedPrefRepositoryImpl(private val pref: SharedPrefs) : SharedPrefReposi
     }
 
     override fun setAutodownloadStoryEffect(pt: String) {
-
         pref.putString(SettingsConstants.AUTODOWNLOAD_EFFECT, pt)
-
     }
 
     override fun get_BOTTOM_NAV_TOOLTIP(): Boolean {
@@ -397,9 +393,7 @@ class SharedPrefRepositoryImpl(private val pref: SharedPrefs) : SharedPrefReposi
     }
 
     override fun set_BOTTOM_NAV_TOOLTIP(boolean: Boolean) {
-
         pref.putBoolean(TooltipsConstants.BOTTOM_NAV_TOOLTIP, boolean)
-
     }
 
     override fun get_DOWNLOADING_OPTION(): DownloadingLocationOptions {
@@ -411,17 +405,18 @@ class SharedPrefRepositoryImpl(private val pref: SharedPrefs) : SharedPrefReposi
     }
 
     override fun set_DOWNLOADING_OPTION(downloadingLocationOptions: DownloadingLocationOptions) {
-        pref.putString(SettingsConstants.DEFAULT_DOWNLOADING_OPTION, downloadingLocationOptions.uiValue)
+        pref.putString(
+            SettingsConstants.DEFAULT_DOWNLOADING_OPTION,
+            downloadingLocationOptions.uiValue
+        )
     }
 
-    override fun ACTIVE_PROFILE_USERNAME(username: String?): String? {
-        if (username == "") {
-            return pref.getString(SettingsConstants.USER_NAME, null)
-        }
-
-        pref.putString(SettingsConstants.USER_NAME, username)
-
+    override fun getLoggedInUsername(): String? {
         return pref.getString(SettingsConstants.USER_NAME, null)
+    }
+
+    override fun setLoggedInUsername(userName: String?) {
+        pref.putString(SettingsConstants.USER_NAME, userName)
     }
 
     override fun APP_OPENED_TIME(time: Long?): Long {
