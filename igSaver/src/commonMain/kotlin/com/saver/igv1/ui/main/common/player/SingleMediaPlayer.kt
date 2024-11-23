@@ -129,7 +129,7 @@ fun SingleMediaPlayer(
                 ) {
 
                     AsyncImage(
-                        model = activeMediaItem?.value?.mediaUrl,
+                        model = activeMediaItem.value?.mediaUrl,
                         contentDescription = null,
                         onState = {
 
@@ -140,7 +140,7 @@ fun SingleMediaPlayer(
                                 }
 
                                 is AsyncImagePainter.State.Success -> {
-                                    if (activeMediaItem?.value?.isVideo == false) {
+                                    if (activeMediaItem.value?.isVideo == false) {
                                         println("87868687 startImageProgressUpdate")
                                         singleMediaPlayerManager.startImageProgressUpdate()
                                     }
@@ -159,7 +159,7 @@ fun SingleMediaPlayer(
                     )
 
 
-                    if (activeMediaItem?.value?.isVideo == true) {
+                    if (activeMediaItem.value?.isVideo == true) {
                         PlayerView(
                             videoPlayerManager = singleMediaPlayerManager.getVideoPlayerManager(),
                             multipleMediaPlayerManager = null,
