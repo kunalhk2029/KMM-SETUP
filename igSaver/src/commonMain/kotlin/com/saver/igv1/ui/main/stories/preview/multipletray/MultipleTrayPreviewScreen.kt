@@ -118,7 +118,7 @@ fun MultipleTrayPreviewScreen(
 
                 LaunchedEffect(multipleMediaPlayerManager.mediaListPositionUpdateFlow.value) {
                     multipleMediaPlayerManager.mediaListPositionUpdateFlow.collect {
-                        it?.let { it1 -> pagerState?.scrollToPage(it1) }
+                        it?.let { it1 -> pagerState?.animateScrollToPage(it1) }
                     }
                 }
 

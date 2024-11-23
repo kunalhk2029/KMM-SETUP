@@ -1,6 +1,7 @@
 package com.saver.igv1.ui.main.common.player
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,8 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -32,6 +36,7 @@ import com.saver.igv1.business.domain.StoryTouchManager.getTouchedStoryInteracti
 import com.saver.igv1.business.domain.VideoPlayerManager
 import com.saver.igv1.business.domain.models.player.PlayerMediaItemInfo
 import com.saver.igv1.business.domain.models.stories.StoryInteractionsMetaData
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -46,6 +51,8 @@ fun MultipleMediaPlayer(
     onStoryInteractionsMetaDataTouched: (StoryInteractionsMetaData) -> Unit = {}
 ) {
 
+
+    val coroutineScope = rememberCoroutineScope()
 
     val isImageLoaded = remember { mutableStateOf(false) }
 
@@ -91,7 +98,27 @@ fun MultipleMediaPlayer(
             modifier = Modifier.fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures(onLongPress = {
+                        multipleMediaPlayerManager.handleMediaPause()
 
+                        coroutineScope.launch {
+                            while (true) {
+                                awaitPointerEventScope {
+                                    val down =
+                                        awaitFirstDown() // Wait for the first pointer down event
+                                    println("Long press started at: ${down.position}")
+                                    // Wait for long press or pointer up
+                                    var isFingerUp = false
+                                    while (!isFingerUp) {
+                                        val event = awaitPointerEvent(PointerEventPass.Main)
+                                        if (event.changes.all { it.changedToUp() }) {
+                                            isFingerUp = true
+                                            multipleMediaPlayerManager.handleMediaResume()
+                                            println("Finger lifted after long press!")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }, onTap = { offset ->
 
                         var isStoryInteractionMetaDataTouched = false
@@ -165,7 +192,7 @@ fun MultipleMediaPlayer(
             ) {
 
                 AsyncImage(
-                    model = activeMediaItem.value.mediaUrl,
+                    model = activeMediaItem.value.thumbNailUrl,
                     contentDescription = null,
                     onState = {
 
@@ -193,7 +220,7 @@ fun MultipleMediaPlayer(
                 )
 
 
-                if (activeMediaItem.value.isVideo == true) {
+                if (activeMediaItem.value.isVideo == true && !pagerState.isScrollInProgress) {
                     PlayerView(
                         videoPlayerManager = videoPlayerManager,
                         multipleMediaPlayerManager = multipleMediaPlayerManager,

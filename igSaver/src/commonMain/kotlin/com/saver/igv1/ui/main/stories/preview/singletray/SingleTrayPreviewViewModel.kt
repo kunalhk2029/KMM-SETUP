@@ -153,6 +153,7 @@ class SingleTrayPreviewViewModel(
                         PlayerMediaItemInfo(
                             mediaUrl = it.videoMediaData?.firstOrNull()?.url
                                 ?: it.imageMediaData?.firstOrNull()?.url,
+                            thumbNailUrl = it.imageMediaData?.firstOrNull()?.url,
                             isVideo = it.isVideo,
                             mediaCreationTimeStamp = it.mediaTakenAtTimeStamp,
                             videoDuration = it.videoDuration,

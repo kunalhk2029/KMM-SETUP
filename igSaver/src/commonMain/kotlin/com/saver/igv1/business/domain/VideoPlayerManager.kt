@@ -13,7 +13,7 @@ expect class VideoPlayerManager {
     fun resumeVideo()
     fun stopVideo(): ReleasedExoPlayerInfo?
     fun getDuration(): Long
-    fun getCurrentPosition(): Long
+    fun getCurrentPosition(): Double
 
 }
 
