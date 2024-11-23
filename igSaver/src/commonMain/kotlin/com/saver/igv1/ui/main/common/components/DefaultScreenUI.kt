@@ -1,6 +1,9 @@
 package com.saver.igv1.ui.main.common.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitHorizontalDragOrCancellation
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +23,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.saver.igv1.Colors
@@ -31,6 +40,7 @@ import com.saver.igv1.business.domain.ProgressBarState
 import com.saver.igv1.business.domain.Screens
 import com.saver.igv1.business.domain.SingleMediaPlayerManager
 import com.saver.igv1.business.domain.UIComponent
+import com.saver.igv1.getCurrentTimeInMillis
 import com.saver.igv1.ui.main.common.bs.DownloadBs
 import com.saver.igv1.ui.main.common.nav_drawer.NavDrawerBody
 import com.saver.igv1.ui.main.common.nav_drawer.NavDrawerHeader
@@ -50,7 +60,7 @@ fun DefaultScreenUI(
     progressBarState: ProgressBarState = ProgressBarState.Idle,
     isDrawerEnabled: Boolean = false,
     isTopBarVisible: Boolean = true,
-    navController: NavController? = null,
+    navController: NavController,
     modalBottomSheetInfo: ModalBottomSheetInfo? = null,
     sheetShape: RoundedCornerShape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
     onModalBottomSheetClosed: () -> Unit = {},
@@ -191,6 +201,29 @@ fun DefaultScreenUI(
 
             Box(
                 modifier = Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+
+                        detectHorizontalDragGestures { change, dragAmount ->
+
+                            if (dragAmount > 0) {
+                                // Start detecting the drag from the left edge
+                                if (change.position.x < 100) {  // Close to the left edge
+                                    // Detect swipe movement towards the right
+                                    if (dragAmount > 10f) { // If drag is greater than 10 pixels
+//                                    onBackSwipeDetected()  // Trigger back swipe action
+                                        println("87868687 onBackSwipeDetected: $it")
+                                        navController.popBackStack()
+                                    }
+                                }
+                            }
+
+                        }
+//                        detectHorizontalDragGestures { change, dragAmount ->
+//                            println("87868687 dragAmount: $dragAmount")
+//                        }
+
+
+                    }
                     .background(MaterialTheme.colors.background),
                 contentAlignment = Alignment.Center
             ) {
@@ -217,6 +250,87 @@ fun DefaultScreenUI(
 
                 if (progressBarState is ProgressBarState.Loading) {
                     CircularProgressIndicator()
+                }
+            }
+        }
+    }
+}
+
+
+suspend fun PointerInputScope.detectSwipeSpeed(
+    onSwipeSpeedDetected: (Float) -> Unit
+) {
+    awaitPointerEventScope {
+        var startPosition: Offset? = null
+        var startTime: Long? = null
+
+        while (true) {
+            // Capture the first touch down event
+            val down =
+                awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.pressed }
+            if (down != null) {
+                // Track the position and time when the swipe starts
+                startPosition = down.position
+                startTime = getCurrentTimeInMillis()
+
+                // Capture the movement of the swipe
+                val drag = awaitHorizontalDragOrCancellation(down.id)
+
+                if (drag != null) {
+                    // Calculate the distance moved and the time taken
+                    val endTime = getCurrentTimeInMillis()
+                    val timeDiff = (endTime - startTime!!) / 1000f  // Time in seconds
+                    val distance =
+                        drag.positionChange().x  // Distance moved horizontally (in pixels)
+
+                    // Calculate velocity (distance / time)
+                    val velocity = distance / timeDiff
+
+                    // Send the velocity (speed) to the callback
+                    onSwipeSpeedDetected(velocity)
+                }
+            }
+        }
+    }
+}
+
+
+suspend fun PointerInputScope.detectSwipeBackGesture(
+    onBackSwipeDetected: () -> Unit
+) {
+    awaitPointerEventScope {
+        var startPosition: Offset? = null
+        var startTime: Long? = null
+
+        // Minimum swipe threshold (distance and time) to recognize back gesture
+        val swipeThreshold = 100f  // Swipe distance threshold (in pixels)
+        val minTimeForSwipe = 0.2f  // Time threshold in seconds for valid swipe (200ms)
+
+        while (true) {
+            val down =
+                awaitPointerEvent(PointerEventPass.Initial).changes.firstOrNull { it.pressed }
+            if (down != null) {
+                // Capture the start position and time
+                startPosition = down.position
+                startTime = getCurrentTimeInMillis()
+
+                // Track horizontal drag movement
+                val drag = awaitHorizontalDragOrCancellation(down.id)
+
+                if (drag != null) {
+                    val currentPosition = drag.positionChange()  // Get the position change
+                    val currentTime = getCurrentTimeInMillis()  // Get the current time
+
+                    // Calculate the time difference in seconds
+                    val timeDiff = (currentTime - startTime!!) / 1000f
+
+                    // Check if swipe is left-to-right and duration is valid
+                    if (currentPosition.x > 0 && timeDiff > minTimeForSwipe) {
+                        if (currentPosition.x > swipeThreshold) {
+                            // Trigger back swipe event
+                            onBackSwipeDetected()
+                        }
+                    }
                 }
             }
         }

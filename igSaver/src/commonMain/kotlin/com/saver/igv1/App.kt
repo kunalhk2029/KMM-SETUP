@@ -137,6 +137,7 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
 
                     MultipleTrayPreviewScreen(
                         multipleTrayPreviewViewModel.state.value,
+                        navController,
                         multipleTrayPreviewViewModel::onEvent
                     ) {
 
@@ -152,6 +153,7 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
 
                     StoriesTrayScreen(
                         storiesTrayViewModel.state.value,
+                        navController,
                         storiesTrayViewModel::onEvent
                     ) {
                         when (it) {
@@ -207,7 +209,8 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
 
                     SingleTrayPreviewScreen(
                         singleTrayPreviewViewModel.state.collectAsState().value,
-                        singleTrayPreviewViewModel::onEvent
+                        singleTrayPreviewViewModel::onEvent,
+                        navController
                     ) {
                         when (it) {
 
@@ -246,6 +249,7 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
                         singleMediaPlayerManager = singleMediaPlayerManager,
                         list = singleTrayPreviewViewModel.state.value.playerMediaItemsData ?: listOf(),
                         startingIndex = startingIndex,
+                        navController = navController
                     )
                 }
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import com.saver.igv1.Colors
@@ -40,6 +41,7 @@ fun SingleMediaPlayer(
     singleMediaPlayerManager: SingleMediaPlayerManager,
     list: List<PlayerMediaItemInfo>,
     startingIndex: Int,
+    navController: NavController
 ) {
 
     val constraint = remember { mutableStateOf(Constraints()) }
@@ -52,10 +54,11 @@ fun SingleMediaPlayer(
         }
     }
 
-    val activeMediaItem = singleMediaPlayerManager.activeMediaItem.collectAsState().value
+    val activeMediaItem = singleMediaPlayerManager.activeMediaItem.collectAsState()
 
     DefaultScreenUI(
-        isTopBarVisible = false
+        isTopBarVisible = false,
+        navController = navController
     ) {
         BoxWithConstraints(
             modifier = Modifier.pointerInput(Unit) {
@@ -69,7 +72,7 @@ fun SingleMediaPlayer(
                             offset = offset,
                             constraint = constraint.value,
                             storyTouchInteractionsMetaData =
-                            it?.storyTouchInteractionsMetaData
+                            it.value?.storyTouchInteractionsMetaData
                         )?.let {
                             isStoryInteractionMetaDataTouched = true
                             singleMediaPlayerManager.handleMediaPause()
@@ -137,7 +140,7 @@ fun SingleMediaPlayer(
                                 }
 
                                 is AsyncImagePainter.State.Success -> {
-                                    if (activeMediaItem?.isVideo == false) {
+                                    if (activeMediaItem?.value?.isVideo == false) {
                                         println("87868687 startImageProgressUpdate")
                                         singleMediaPlayerManager.startImageProgressUpdate()
                                     }
@@ -156,7 +159,7 @@ fun SingleMediaPlayer(
                     )
 
 
-                    if (activeMediaItem?.isVideo == true) {
+                    if (activeMediaItem?.value?.isVideo == true) {
                         PlayerView(
                             videoPlayerManager = singleMediaPlayerManager.getVideoPlayerManager(),
                             multipleMediaPlayerManager = null,

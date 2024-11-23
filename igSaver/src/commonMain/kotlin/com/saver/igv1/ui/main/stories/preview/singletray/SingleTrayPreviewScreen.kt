@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.saver.igv1.Colors
 import com.saver.igv1.business.domain.ModalBottomSheetInfo
@@ -39,10 +40,12 @@ import org.jetbrains.compose.resources.painterResource
 fun SingleTrayPreviewScreen(
     singleTrayPreviewState: SingleTrayPreviewState,
     onEvents: (SingleTrayPreviewEvents) -> Unit,
+    navController: NavController,
     onNavEvents: (SingleTrayPreviewNavEvents) -> Unit
 ) {
 
     DefaultScreenUI(
+        navController = navController ,
         uiComponent = singleTrayPreviewState.uiComponent.collectAsState().value,
         progressBarState = singleTrayPreviewState.progressBarState.collectAsState().value,
         modalBottomSheetInfo = singleTrayPreviewState.activeModalBottomSheetInfo.collectAsState().value,

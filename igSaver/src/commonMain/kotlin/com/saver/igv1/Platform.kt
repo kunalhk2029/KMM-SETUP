@@ -14,6 +14,8 @@ expect object AndroidVersion {
     fun isVersionAbove33(): Boolean
 }
 
+expect fun getCurrentTimeInMillis(): Long
+
 expect class WebView() {
     fun load(url: String, sharedPrefRepository: SharedPrefRepository)
 }

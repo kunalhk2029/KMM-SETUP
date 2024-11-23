@@ -25,3 +25,7 @@ actual class WebView {
     ) {
     }
 }
+
+actual fun getCurrentTimeInMillis(): Long {
+    return System.currentTimeMillis()
+}

@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.saver.igv1.business.domain.MediaPlayerProgressManager
 import com.saver.igv1.business.domain.MultiMediaPlayerEventListener
 import com.saver.igv1.business.domain.MultipleMediaPlayerManager
@@ -25,6 +26,7 @@ import org.koin.compose.koinInject
 @Composable
 fun MultipleTrayPreviewScreen(
     multipleTrayPreviewState: MultipleTrayPreviewState,
+    navController: NavController,
     onEvents: (MultipleTrayPreviewEvents) -> Unit,
     onNavEvents: (MultipleTrayPreviewNavEvents) -> Unit
 ) {
@@ -76,6 +78,7 @@ fun MultipleTrayPreviewScreen(
         progressBarState = multipleTrayPreviewState.progressBarState.collectAsState().value,
         modalBottomSheetInfo = multipleTrayPreviewState.activeModalBottomSheetInfo.collectAsState().value,
         mediaPlayerProgressManager = mediaPlayerProgressManager,
+        navController = navController,
         onModalBottomSheetClosed = {
             onEvents(
                 MultipleTrayPreviewEvents.UpdateActiveModalBottomSheetInfo(
@@ -120,6 +123,7 @@ fun MultipleTrayPreviewScreen(
                 }
 
                 if (pagerState != null) {
+
                     HorizontalPager(
                         state = pagerState,
                     ) {

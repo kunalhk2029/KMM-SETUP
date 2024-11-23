@@ -8,10 +8,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import platform.Foundation.NSDate
 import platform.Foundation.NSHTTPCookie
 import platform.Foundation.NSHTTPCookieStorage
 import platform.Foundation.NSURL
 import platform.Foundation.NSURLRequest
+import platform.Foundation.timeIntervalSince1970
 import platform.UIKit.UIApplication
 import platform.UIKit.UIViewController
 import platform.WebKit.WKWebView
@@ -161,3 +163,6 @@ class WebViewIOS(
     }
 }
 
+actual fun getCurrentTimeInMillis(): Long {
+    return NSDate().timeIntervalSince1970.toLong() * 1000
+}

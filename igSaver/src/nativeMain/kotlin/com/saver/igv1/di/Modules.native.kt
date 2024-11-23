@@ -15,13 +15,18 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSFileManager
 import platform.Foundation.NSHomeDirectory
+import platform.Foundation.NSUserDomainMask
 
+@OptIn(ExperimentalForeignApi::class)
 actual val platformModule: Module = module {
     singleOf(::SharedPrefs)
 
@@ -44,7 +49,16 @@ actual val platformModule: Module = module {
     }
 
     single<PrimaryDatabase> {
-        val dbFile = NSHomeDirectory() + "/primary_database.db"
+        val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = false,
+            error = null,
+        )
+        val dbFile = requireNotNull(documentDirectory?.path) + "/primary_database.db"
+
+//        val dbFile = NSHomeDirectory() + "/primary_database.db"
         Room.databaseBuilder<PrimaryDatabase>(
             name = dbFile
         ).setDriver(BundledSQLiteDriver()).build()
