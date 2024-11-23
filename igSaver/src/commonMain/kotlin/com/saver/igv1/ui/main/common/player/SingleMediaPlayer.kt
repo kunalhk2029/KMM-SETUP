@@ -129,7 +129,7 @@ fun SingleMediaPlayer(
                 ) {
 
                     AsyncImage(
-                        model = activeMediaItem?.mediaUrl,
+                        model = activeMediaItem?.value?.mediaUrl,
                         contentDescription = null,
                         onState = {
 
