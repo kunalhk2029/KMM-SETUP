@@ -2,6 +2,7 @@ package com.saver.igv1.ui.main.common.player
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import com.saver.igv1.business.domain.StoryTouchManager.getTouchedStoryInteracti
 import com.saver.igv1.business.domain.VideoPlayerManager
 import com.saver.igv1.business.domain.models.player.PlayerMediaItemInfo
 import com.saver.igv1.business.domain.models.stories.StoryInteractionsMetaData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -97,28 +99,53 @@ fun MultipleMediaPlayer(
         Column(
             modifier = Modifier.fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures(onLongPress = {
-                        multipleMediaPlayerManager.handleMediaPause()
 
-                        coroutineScope.launch {
+                    coroutineScope.launch {
+
+                        awaitPointerEventScope {
                             while (true) {
-                                awaitPointerEventScope {
-                                    val down =
-                                        awaitFirstDown() // Wait for the first pointer down event
-                                    println("Long press started at: ${down.position}")
-                                    // Wait for long press or pointer up
-                                    var isFingerUp = false
-                                    while (!isFingerUp) {
+                                val down = awaitFirstDown() // Wait for the first pointer down event
+
+                                // Detect long press or interruption
+                                val longPress = awaitLongPressOrCancellation(down.id)
+
+                                if (longPress != null) {
+                                    // Wait for to up event
+                                    var isUpEvent = false
+                                    while (!isUpEvent) {
                                         val event = awaitPointerEvent(PointerEventPass.Main)
                                         if (event.changes.all { it.changedToUp() }) {
-                                            isFingerUp = true
+                                            isUpEvent = true
                                             multipleMediaPlayerManager.handleMediaResume()
-                                            println("Finger lifted after long press!")
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+
+                    detectTapGestures(onLongPress = {
+                        multipleMediaPlayerManager.handleMediaPause()
+                        println("7677656 Long press detected!")
+//                        coroutineScope.launch {
+//                            while (true) {
+//                                awaitPointerEventScope {
+//                                    val down =
+//                                        awaitFirstDown() // Wait for the first pointer down event
+//                                    println("Long press started at: ${down.position}")
+//                                    // Wait for long press or pointer up
+//                                    var isFingerUp = false
+//                                    while (!isFingerUp) {
+//                                        val event = awaitPointerEvent(PointerEventPass.Main)
+//                                        if (event.changes.all { it.changedToUp() }) {
+//                                            isFingerUp = true
+//                                            multipleMediaPlayerManager.handleMediaResume()
+//                                            println("7677656 lifted after long press!")
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
                     }, onTap = { offset ->
 
                         var isStoryInteractionMetaDataTouched = false
