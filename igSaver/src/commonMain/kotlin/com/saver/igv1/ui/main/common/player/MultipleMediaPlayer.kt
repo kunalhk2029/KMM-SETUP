@@ -33,10 +33,12 @@ import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import com.saver.igv1.Colors
 import com.saver.igv1.business.domain.MultipleMediaPlayerManager
+import com.saver.igv1.business.domain.PlatformInfo
 import com.saver.igv1.business.domain.StoryTouchManager.getTouchedStoryInteractionsMetaData
 import com.saver.igv1.business.domain.VideoPlayerManager
 import com.saver.igv1.business.domain.models.player.PlayerMediaItemInfo
 import com.saver.igv1.business.domain.models.stories.StoryInteractionsMetaData
+import com.saver.igv1.getPlatform
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -127,25 +129,6 @@ fun MultipleMediaPlayer(
                     detectTapGestures(onLongPress = {
                         multipleMediaPlayerManager.handleMediaPause()
                         println("7677656 Long press detected!")
-//                        coroutineScope.launch {
-//                            while (true) {
-//                                awaitPointerEventScope {
-//                                    val down =
-//                                        awaitFirstDown() // Wait for the first pointer down event
-//                                    println("Long press started at: ${down.position}")
-//                                    // Wait for long press or pointer up
-//                                    var isFingerUp = false
-//                                    while (!isFingerUp) {
-//                                        val event = awaitPointerEvent(PointerEventPass.Main)
-//                                        if (event.changes.all { it.changedToUp() }) {
-//                                            isFingerUp = true
-//                                            multipleMediaPlayerManager.handleMediaResume()
-//                                            println("7677656 lifted after long press!")
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
                     }, onTap = { offset ->
 
                         var isStoryInteractionMetaDataTouched = false
@@ -247,7 +230,9 @@ fun MultipleMediaPlayer(
                 )
 
 
-                if (activeMediaItem.value.isVideo == true && !pagerState.isScrollInProgress) {
+                if (activeMediaItem.value.isVideo == true &&
+                    if (getPlatform() is PlatformInfo.IOS) !pagerState.isScrollInProgress else true
+                ) {
                     PlayerView(
                         videoPlayerManager = videoPlayerManager,
                         multipleMediaPlayerManager = multipleMediaPlayerManager,

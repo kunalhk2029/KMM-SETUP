@@ -109,63 +109,66 @@ class MediaPlayerProgressManager(
         CoroutineScope(Dispatchers.Default + videoMediaProgressUpdateJob).launch {
             ensureActive()
 
-            if (getPlatform() is PlatformInfo.Android) {
-                val mediaDuration = videoPlayerManager.getDuration()*1000L
-                println("56445 mediaDuration  $mediaDuration")
-                val progressUpdateInterval = videoMediaProgressUpdateInterval
-                val progressUpdateCount = mediaDuration / progressUpdateInterval
-                val progressUpdateStep = 1f / progressUpdateCount
-                println("56445 progressUpdateInterval  $progressUpdateInterval")
-                println("56445 progressUpdateCount  $progressUpdateCount")
-                println("56445 progressUpdateStep  $progressUpdateStep")
+//            if (getPlatform() is PlatformInfo.Android) {
+//                val mediaDuration = videoPlayerManager.getDuration()*1000L
+//                println("56445 mediaDuration  $mediaDuration")
+//                val progressUpdateInterval = videoMediaProgressUpdateInterval
+//                val progressUpdateCount = mediaDuration / progressUpdateInterval
+//                val progressUpdateStep = 1f / progressUpdateCount
+//                println("56445 progressUpdateInterval  $progressUpdateInterval")
+//                println("56445 progressUpdateCount  $progressUpdateCount")
+//                println("56445 progressUpdateStep  $progressUpdateStep")
+//
+//                for (i in progressUpdateStartCount..progressUpdateCount) {
+////                    progressUpdateStartCount++
+//                    ensureActive()
+//                    currentProgress = i * progressUpdateStep
+//                    println("56445 currentProgress  $currentProgress")
+//                    mediaItemProgressData?.value = currentProgress
+//
+//                    multiMediaPlayerEventListener?.onProgressUpdated(
+//                        mediaListPosition = this@MediaPlayerProgressManager.activeMediaKey!!,
+//                        mediaListItemPosition = this@MediaPlayerProgressManager.activeMediaItemPosition!![activeMediaKey]
+//                            ?: 0,
+//                        progress = currentProgress
+//                    )
+//
+//                    if (currentProgress >= 1f && videoMediaProgressUpdateJob.isActive) {
+//                        videoMediaProgressUpdateJob.complete()
+//                    }
+//                    delay(progressUpdateInterval)
+//                }
+//            }
 
-                for (i in progressUpdateStartCount..progressUpdateCount) {
-//                    progressUpdateStartCount++
-                    ensureActive()
-                    currentProgress = i * progressUpdateStep
-                    println("56445 currentProgress  $currentProgress")
-                    mediaItemProgressData?.value = currentProgress
-
-                    multiMediaPlayerEventListener?.onProgressUpdated(
-                        mediaListPosition = this@MediaPlayerProgressManager.activeMediaKey!!,
-                        mediaListItemPosition = this@MediaPlayerProgressManager.activeMediaItemPosition!![activeMediaKey]
-                            ?: 0,
-                        progress = currentProgress
-                    )
-
-                    if (currentProgress >= 1f && videoMediaProgressUpdateJob.isActive) {
-                        videoMediaProgressUpdateJob.complete()
-                    }
-                    delay(progressUpdateInterval)
+            while (videoMediaProgressUpdateJob.isActive) {
+                ensureActive()
+                withContext(Dispatchers.Main) {
+                    currentProgress = if (videoPlayerManager.getDuration() > 0) {
+                        (((if (getPlatform() is PlatformInfo.Android)
+                            videoPlayerManager.getAndroidPlayerCurrentPlaybackPosition() else
+                            videoPlayerManager.getIosPlayerCurrentPlaybackPosition())
+                            .toDouble() / videoPlayerManager.getDuration()) * 100).toFloat()
+                    } else 0f
                 }
-            } else {
-                while (videoMediaProgressUpdateJob.isActive) {
-                    ensureActive()
-                    withContext(Dispatchers.Main) {
-                        currentProgress = if (videoPlayerManager.getDuration() > 0) {
-                            ((videoPlayerManager.getCurrentPosition()
-                                .toDouble() / videoPlayerManager.getDuration()) * 100).toFloat()
-                        } else 0f
-                    }
 
-                    println("56445 updateVideoMediaProgress currentProgress $currentProgress")
-                    multiMediaPlayerEventListener?.onProgressUpdated(
-                        mediaListPosition = this@MediaPlayerProgressManager.activeMediaKey!!,
-                        mediaListItemPosition = this@MediaPlayerProgressManager.activeMediaItemPosition!![activeMediaKey]
-                            ?: 0,
-                        progress = currentProgress / 100f
-                    )
+                println("56445 updateVideoMediaProgress currentProgress $currentProgress")
+                multiMediaPlayerEventListener?.onProgressUpdated(
+                    mediaListPosition = this@MediaPlayerProgressManager.activeMediaKey!!,
+                    mediaListItemPosition = this@MediaPlayerProgressManager.activeMediaItemPosition!![activeMediaKey]
+                        ?: 0,
+                    progress = currentProgress / 100f
+                )
 
-                    mediaItemProgressData?.value = currentProgress / 100f
+                mediaItemProgressData?.value = currentProgress / 100f
 
 
-                    if (currentProgress >= 100f) {
-                        videoMediaProgressUpdateJob.complete()
-                    }
-
-                    delay(videoMediaProgressUpdateInterval)
+                if (currentProgress >= 100f) {
+                    videoMediaProgressUpdateJob.complete()
                 }
+
+                delay(videoMediaProgressUpdateInterval)
             }
+
         }
     }
 

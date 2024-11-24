@@ -1,6 +1,8 @@
 package com.saver.igv1.ui.main.common.player
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,8 +22,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -29,10 +34,13 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import com.saver.igv1.Colors
+import com.saver.igv1.business.domain.ModalBottomSheetInfo
 import com.saver.igv1.business.domain.SingleMediaPlayerManager
 import com.saver.igv1.business.domain.StoryTouchManager
 import com.saver.igv1.business.domain.models.player.PlayerMediaItemInfo
+import com.saver.igv1.business.domain.models.stories.StoryInteractionsMetaData
 import com.saver.igv1.ui.main.common.components.DefaultScreenUI
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -41,8 +49,13 @@ fun SingleMediaPlayer(
     singleMediaPlayerManager: SingleMediaPlayerManager,
     list: List<PlayerMediaItemInfo>,
     startingIndex: Int,
-    navController: NavController
+    navController: NavController,
+    modalBottomSheetInfo: ModalBottomSheetInfo?,
+    onModalBottomSheetClosed: () -> Unit = {},
+    onStoryInteractionsMetaDataTouched: (StoryInteractionsMetaData) -> Unit = {}
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
 
     val constraint = remember { mutableStateOf(Constraints()) }
 
@@ -58,46 +71,77 @@ fun SingleMediaPlayer(
 
     DefaultScreenUI(
         isTopBarVisible = false,
-        navController = navController
+        navController = navController,
+        modalBottomSheetInfo = modalBottomSheetInfo,
+        onModalBottomSheetClosed = onModalBottomSheetClosed
     ) {
         BoxWithConstraints(
-            modifier = Modifier.pointerInput(Unit) {
-                detectTapGestures(onLongPress = {
-
-                }, onTap = { offset ->
-
-                    var isStoryInteractionMetaDataTouched = false
-                    activeMediaItem.let {
-                        StoryTouchManager.getTouchedStoryInteractionsMetaData(
-                            offset = offset,
-                            constraint = constraint.value,
-                            storyTouchInteractionsMetaData =
-                            it.value?.storyTouchInteractionsMetaData
-                        )?.let {
-                            isStoryInteractionMetaDataTouched = true
-                            singleMediaPlayerManager.handleMediaPause()
-                        }
-                    }
-
-                    if (!isStoryInteractionMetaDataTouched) {
-                        singleMediaPlayerManager.handleMediaPause()
-                        if (offset.x <= constraint.value.maxWidth / 2) {
-                            println("87868687 startPlayingMedia previous")
-                            singleMediaPlayerManager.startPlayingMedia(playPrev = true)
-
-                        } else {
-                            println("87868687 startPlayingMedia next")
-                            singleMediaPlayerManager.startPlayingMedia(playNext = true)
-                        }
-                    }
-                })
-            }
+            modifier = Modifier
         ) {
 
             constraint.value = constraints
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+
+                        coroutineScope.launch {
+
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val down =
+                                        awaitFirstDown() // Wait for the first pointer down event
+
+                                    // Detect long press or interruption
+                                    val longPress = awaitLongPressOrCancellation(down.id)
+
+                                    if (longPress != null) {
+                                        // Wait for to up event
+                                        var isUpEvent = false
+                                        while (!isUpEvent) {
+                                            val event = awaitPointerEvent(PointerEventPass.Main)
+                                            if (event.changes.all { it.changedToUp() }) {
+                                                isUpEvent = true
+                                                singleMediaPlayerManager.handleMediaResume()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        detectTapGestures(onLongPress = {
+                            singleMediaPlayerManager.handleMediaPause()
+                            println("7677656 Long press detected!")
+                        }, onTap = { offset ->
+
+                            var isStoryInteractionMetaDataTouched = false
+                            activeMediaItem.value?.let {
+                                StoryTouchManager.getTouchedStoryInteractionsMetaData(
+                                    offset = offset,
+                                    constraint = constraints,
+                                    storyTouchInteractionsMetaData =
+                                    it.storyTouchInteractionsMetaData
+                                )?.let {
+                                    isStoryInteractionMetaDataTouched = true
+                                    singleMediaPlayerManager.handleMediaPause()
+                                    onStoryInteractionsMetaDataTouched.invoke(it)
+                                }
+                            }
+
+                            if (!isStoryInteractionMetaDataTouched) {
+                                singleMediaPlayerManager.handleMediaPause()
+                                if (offset.x <= constraints.maxWidth / 2) {
+                                    println("87868687 startPlayingMedia previous")
+                                    singleMediaPlayerManager.startPlayingMedia(playPrev = true)
+
+                                } else {
+                                    println("87868687 startPlayingMedia next")
+                                    singleMediaPlayerManager.startPlayingMedia(playNext = true)
+                                }
+                            }
+                        })
+                    },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 

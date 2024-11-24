@@ -29,6 +29,7 @@ import androidx.navigation.toRoute
 import com.saver.igv1.business.domain.MediaPlayerProgressManager
 import com.saver.igv1.business.domain.Screens
 import com.saver.igv1.business.domain.SingleMediaPlayerManager
+import com.saver.igv1.business.domain.getModalBottomSheetForTouchedStoryInteractions
 import com.saver.igv1.ui.main.common.player.SingleMediaPlayer
 import com.saver.igv1.ui.main.stories.preview.multipletray.MultipleTrayPreviewEvents
 import com.saver.igv1.ui.main.stories.preview.multipletray.MultipleTrayPreviewScreen
@@ -191,7 +192,7 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
 
                 composable<Screens.SingleTrayPreview>(
 
-                    ) {
+                ) {
 
                     val storiesTrayViewModel = koinViewModel<StoriesTrayViewModel>(
                         viewModelStoreOwner = storyTrayViewModelOwner
@@ -247,10 +248,25 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
 
                     SingleMediaPlayer(
                         singleMediaPlayerManager = singleMediaPlayerManager,
-                        list = singleTrayPreviewViewModel.state.value.playerMediaItemsData ?: listOf(),
+                        list = singleTrayPreviewViewModel.state.value.playerMediaItemsData
+                            ?: listOf(),
+                        modalBottomSheetInfo = singleTrayPreviewViewModel.state.value.activeModalBottomSheetInfo.collectAsState().value,
                         startingIndex = startingIndex,
-                        navController = navController
-                    )
+                        navController = navController,
+                        onModalBottomSheetClosed = {
+                            singleTrayPreviewViewModel.onEvent(
+                                SingleTrayPreviewEvents.UpdateActiveModalBottomSheetInfo(
+                                    null
+                                )
+                            )
+                        }
+                    ) {
+                        singleTrayPreviewViewModel.onEvent(
+                            SingleTrayPreviewEvents.UpdateActiveModalBottomSheetInfo(
+                                getModalBottomSheetForTouchedStoryInteractions(it)
+                            )
+                        )
+                    }
                 }
 
                 composable<Screens.PasteAndDownload> {

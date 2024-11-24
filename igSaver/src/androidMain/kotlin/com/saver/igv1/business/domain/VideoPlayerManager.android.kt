@@ -43,7 +43,8 @@ actual class VideoPlayerManager(
     actual fun playVideo(
         url: String,
         releasedExoPlayerInfo: ReleasedExoPlayerInfo?,
-        videoPlayerEventListener: VideoPlayerEventListener
+        videoPlayerEventListener: VideoPlayerEventListener,
+        interval: Double?
     ): Any {
         this.videoPlayerEventListener = videoPlayerEventListener
         return prepareExoplayer(url, releasedExoPlayerInfo)
@@ -68,8 +69,12 @@ actual class VideoPlayerManager(
         return player?.duration ?: 0L
     }
 
-    actual fun getCurrentPosition(): Long {
+    actual fun getAndroidPlayerCurrentPlaybackPosition(): Long {
         return player?.currentPosition ?: 0L
+    }
+
+    actual fun getIosPlayerCurrentPlaybackPosition(): Double {
+        return 0.0
     }
 
     actual fun stopVideo(): ReleasedExoPlayerInfo? {

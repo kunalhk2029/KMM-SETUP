@@ -52,18 +52,17 @@ actual class VideoPlayerManager {
     var isVideoEndSent = false
     var currentTime = 0.0
     var duration: Long = 0
+    var observalInterval: Double = 0.001
     private var timeObserver: Any? = null
-
-    @OptIn(ExperimentalForeignApi::class)
-    var observer: ((CValue<CMTime>) -> Unit)? = null
-
 
     @OptIn(ExperimentalForeignApi::class)
     actual fun playVideo(
         url: String,
         releasedExoPlayerInfo: ReleasedExoPlayerInfo?,
-        videoPlayerEventListener: VideoPlayerEventListener
+        videoPlayerEventListener: VideoPlayerEventListener,
+        interval: Double?
     ): Any {
+        observalInterval = interval ?: 0.001
         isVideStartedSent = false
         isVideoEndSent = false
         this.videoPlayerEventListener = videoPlayerEventListener
@@ -134,7 +133,7 @@ actual class VideoPlayerManager {
                 }
             }
         }
-        val interval = CMTimeMakeWithSeconds(0.001, NSEC_PER_SEC.toInt())
+        val interval = CMTimeMakeWithSeconds(observalInterval, NSEC_PER_SEC.toInt())
         timeObserver = avPlayer?.addPeriodicTimeObserverForInterval(interval, null, observer)
         NSNotificationCenter.defaultCenter.addObserverForName(
             name = AVPlayerItemDidPlayToEndTimeNotification,
@@ -178,8 +177,13 @@ actual class VideoPlayerManager {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual fun getCurrentPosition(): Double {
+    actual fun getIosPlayerCurrentPlaybackPosition(): Double {
+
         return currentTime
+    }
+
+    actual fun getAndroidPlayerCurrentPlaybackPosition(): Long {
+        return 0L
     }
 
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.interop.UIKitView
 import com.saver.igv1.business.domain.MultipleMediaPlayerManager
 import com.saver.igv1.business.domain.SingleMediaPlayerManager
 import com.saver.igv1.business.domain.VideoPlayerManager
-import com.saver.igv1.business.domain.models.player.PlayerMediaItemInfo
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGRect

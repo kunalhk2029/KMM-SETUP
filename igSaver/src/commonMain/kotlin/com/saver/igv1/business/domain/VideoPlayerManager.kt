@@ -6,14 +6,16 @@ expect class VideoPlayerManager {
 
     fun playVideo(
         url: String, releasedExoPlayerInfo: ReleasedExoPlayerInfo?,
-        videoPlayerEventListener: VideoPlayerEventListener
+        videoPlayerEventListener: VideoPlayerEventListener,
+        interval: Double? = null
     ): Any
 
     fun pauseVideo()
     fun resumeVideo()
     fun stopVideo(): ReleasedExoPlayerInfo?
     fun getDuration(): Long
-    fun getCurrentPosition(): Double
+    fun getAndroidPlayerCurrentPlaybackPosition(): Long
+    fun getIosPlayerCurrentPlaybackPosition(): Double
 
 }
 

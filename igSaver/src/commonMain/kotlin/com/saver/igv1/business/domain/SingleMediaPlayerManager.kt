@@ -42,9 +42,7 @@ class SingleMediaPlayerManager(
     }
 
     fun getActiveMediaItem(): PlayerMediaItemInfo? {
-        if (activeMediaItemPosition >= 0 && activeMediaItemPosition < (mediaItems?.size ?: 0)
-        ) {
-
+        if (activeMediaItemPosition >= 0 && activeMediaItemPosition < (mediaItems?.size ?: 0)) {
             val activeMediaItem = mediaItems?.get(activeMediaItemPosition)
             return activeMediaItem
         }
@@ -98,7 +96,9 @@ class SingleMediaPlayerManager(
     private fun playVideo(): Any? {
         return getActiveMediaItem()?.let { mediaItem ->
             mediaItem.mediaUrl?.let {
-                videoPlayerManager.playVideo(it, videoItemResumeInfoData[mediaItem.id], this)
+                videoPlayerManager.playVideo(
+                    it, videoItemResumeInfoData[mediaItem.id], this
+                )
             }
         }
     }
