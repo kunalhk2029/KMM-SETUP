@@ -1,4 +1,4 @@
-rootProject.name = "InstagramSaverV1"
+rootProject.name = "CreditCardReferral"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -28,4 +28,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":igSaver")
+include(":creditCardReferral")
