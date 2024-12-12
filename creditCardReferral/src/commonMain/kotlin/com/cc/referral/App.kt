@@ -102,7 +102,7 @@ fun App(androidPlatformSpecificMethods: AndroidPlatformSpecificMethods? = null) 
                 }
             }
 
-            NavHost(navController = navController, startDestination = Screens.AppOverView) {
+            NavHost(navController = navController, startDestination = Screens.Splash) {
 
                 composable<Screens.Splash> {
                     SplashScreen()

@@ -94,39 +94,38 @@ fun GenericInputFieldComponent(
                     color = AppColors.greyEFEFEF
                 ),
                 decorationBox = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
 
-                            if (isFlagVisible) {
+                        if (isFlagVisible) {
 
-                                Image(
-                                    painter = painterResource(
-                                        Res.drawable.ic_flag_india
-                                    ),
-                                    null,
-                                    modifier = Modifier.height(20.dp),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Fit,
-                                )
+                            Image(
+                                painter = painterResource(
+                                    Res.drawable.ic_flag_india
+                                ),
+                                null,
+                                modifier = Modifier.height(20.dp),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                            )
 
-                                Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
 
-                                Text(
-                                    text = "+91 -",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = AppColors.black
-                                )
+                            Text(
+                                text = "+91 -",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = AppColors.black
+                            )
 
-                                Spacer(modifier = Modifier.width(5.dp))
-                            }
+                            Spacer(modifier = Modifier.width(5.dp))
+                        }
+                        Box {
 
-                            if (inputText.value?.isEmpty() == true) {
+                            it()
+
+                            if (inputText.value.isNullOrEmpty()) {
                                 hintText?.let { it1 ->
                                     Text(
                                         text = it1,
@@ -138,8 +137,6 @@ fun GenericInputFieldComponent(
                                 }
                             }
                         }
-
-                        it()
                     }
                 },
                 cursorBrush = SolidColor(AppColors.green15320077),

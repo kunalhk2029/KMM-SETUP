@@ -8,4 +8,6 @@ data class RegisterState(
     val name: MutableState<String?> = mutableStateOf(null),
     val mobileNumber: MutableState<String?> = mutableStateOf(null),
     val isWhatsAppUpdatesEnabled: Boolean = false,
+    val isOtpSent: Boolean? = null,
+    val isOtpVerified: Boolean? = null
 ) : ViewStateExt()

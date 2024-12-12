@@ -8,7 +8,6 @@ class LoginViewModel : ViewModel() {
 
     val state = MutableStateFlow(LoginState())
 
-
     fun onEvent(event: LoginEvents) {
         when (event) {
             is LoginEvents.LoginWithOTP -> {

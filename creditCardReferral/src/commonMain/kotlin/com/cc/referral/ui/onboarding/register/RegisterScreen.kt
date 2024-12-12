@@ -20,6 +20,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,10 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.cc.referral.AppColors
 import com.cc.referral.ui.components.GenericInputFieldComponent
 import com.cc.referral.ui.components.GenericRoundedCornerTextComponent
 import com.cc.referral.ui.components.WhatsAppUpdateToggleComponent
+import com.cc.referral.ui.main.common.components.DefaultScreenUI
 import creditcardreferral.creditcardreferral.generated.resources.Res
 import creditcardreferral.creditcardreferral.generated.resources.ic_app_branding
 import creditcardreferral.creditcardreferral.generated.resources.ic_app_overview_bg
@@ -50,75 +53,83 @@ fun RegisterScreen(
     onNavEvents: (RegisterNavEvents) -> Unit
 ) {
 
-
-    Column(
-        modifier = Modifier.fillMaxSize().background(AppColors.white)
-            .padding(horizontal = 25.dp)
-            .padding(top = 40.dp)
-
+    DefaultScreenUI(
+        progressBarState = state.progressBarState.collectAsState().value,
+        modalBottomSheetInfo = state.activeModalBottomSheetInfo.collectAsState().value,
+        onModalBottomSheetClosed = {
+            state.updateActiveModalBottomSheetInfo(null)
+        }
     ) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(AppColors.white)
+                .padding(horizontal = 25.dp)
+                .padding(top = 40.dp)
 
-        Image(
-            painterResource(resource = Res.drawable.ic_app_branding), null,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
-
-        Spacer(modifier = Modifier.height(55.dp))
-
-        Text(
-            "Register your account",
-            color = AppColors.black,
-            fontSize = 28.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(55.dp))
-
-        GenericInputFieldComponent(
-            headerTitle = AnnotatedString("Full Name"),
-            inputText = state.name,
-            hintText = "Enter name as per PAN Card",
-        )
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        GenericInputFieldComponent(
-            headerTitle = AnnotatedString(""),
-            inputText = state.mobileNumber,
-            hintText = "Enter mobile number",
-            isFlagVisible = true
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        GenericRoundedCornerTextComponent(
-            text = "Register with OTP",
-            textSize = 16.sp
         ) {
 
+            Image(
+                painterResource(resource = Res.drawable.ic_app_branding), null,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+
+            Spacer(modifier = Modifier.height(55.dp))
+
+            Text(
+                "Register your account",
+                color = AppColors.black,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(55.dp))
+
+            GenericInputFieldComponent(
+                headerTitle = AnnotatedString("Full Name"),
+                inputText = state.name,
+                hintText = "Enter name as per PAN Card",
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            GenericInputFieldComponent(
+                headerTitle = AnnotatedString(""),
+                inputText = state.mobileNumber,
+                hintText = "Enter mobile number",
+                isFlagVisible = true
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            GenericRoundedCornerTextComponent(
+                text = "Register with OTP",
+                textSize = 16.sp
+            ) {
+                onEvents(RegisterEvents.RegisterWithOTP)
+            }
+
+            Spacer(modifier = Modifier.height(35.dp))
+
+            WhatsAppUpdateToggleComponent(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                onEvents(RegisterEvents.UpdateWhatsAppUpdatesToggleState(it))
+            }
+
+            Spacer(modifier = Modifier.weight(1f)) // Takes up all available space
+
+            Text(
+                "By continuing, you agree with our Privacy Policy, Credit Report Terms of Use and Terms of Use",
+                color = AppColors.black,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 35.dp),
+                lineHeight = 14.sp
+            )
+
         }
-
-        Spacer(modifier = Modifier.height(35.dp))
-
-        WhatsAppUpdateToggleComponent(
-            modifier = Modifier.fillMaxWidth()
-        ){
-            onEvents(RegisterEvents.UpdateWhatsAppUpdatesToggleState(it))
-        }
-
-        Spacer(modifier = Modifier.weight(1f)) // Takes up all available space
-
-        Text(
-            "By continuing, you agree with our Privacy Policy, Credit Report Terms of Use and Terms of Use",
-            color = AppColors.black,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 35.dp),
-            lineHeight = 14.sp
-        )
-
     }
+
 }
