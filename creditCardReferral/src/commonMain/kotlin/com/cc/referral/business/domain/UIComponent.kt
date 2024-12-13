@@ -13,4 +13,8 @@ sealed class UIComponent {
         val message: String,
     ) : UIComponent()
 
+    data class SnackBar(
+        val message: String,
+    ) : UIComponent()
+
 }

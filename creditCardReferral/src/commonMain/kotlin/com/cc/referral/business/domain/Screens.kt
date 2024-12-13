@@ -19,4 +19,13 @@ sealed class Screens {
 
     @Serializable
     data object Login : Screens()
+
+    @Serializable
+    data object KYC1 : Screens()
+
+    @Serializable
+    data object KYC2 : Screens()
+
+    @Serializable
+    data object CardOffers : Screens()
 }

@@ -15,6 +15,9 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -28,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.cc.referral.AppColors
@@ -64,6 +68,7 @@ fun DefaultScreenUI(
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val drawerLevelModalBottomSheetInfo: MutableState<ModalBottomSheetInfo?> =
         remember { mutableStateOf(null) }
@@ -72,6 +77,8 @@ fun DefaultScreenUI(
         initialValue = ModalBottomSheetValue.Hidden,
     )
 
+    val snackBarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(modalBottomSheetState.isVisible) {
         if (!modalBottomSheetState.isVisible) {
             drawerLevelModalBottomSheetInfo.value = null
@@ -79,10 +86,28 @@ fun DefaultScreenUI(
         }
     }
 
+    LaunchedEffect(uiComponent) {
+        if (uiComponent != UIComponent.None) {
+            when (uiComponent) {
+                is UIComponent.SnackBar -> {
+                    snackBarHostState.showSnackbar(
+                        uiComponent.message,
+                        null,
+                        SnackbarDuration.Short
+                    )
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     LaunchedEffect(modalBottomSheetInfo, drawerLevelModalBottomSheetInfo.value) {
         if (modalBottomSheetInfo != null && modalBottomSheetInfo != ModalBottomSheetInfo.None) {
+            keyboardController?.hide()
             modalBottomSheetState.show()
         } else if (drawerLevelModalBottomSheetInfo.value != null) {
+            keyboardController?.hide()
             modalBottomSheetState.show()
         } else {
             modalBottomSheetState.hide()
@@ -118,6 +143,7 @@ fun DefaultScreenUI(
         sheetShape = sheetShape,
     ) {
 
+
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
@@ -130,6 +156,9 @@ fun DefaultScreenUI(
             },
             drawerGesturesEnabled = isDrawerEnabled,
             drawerShape = RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp),
+            snackbarHost = {
+                SnackbarHost(snackBarHostState)
+            },
         ) {
 
             Box(
@@ -156,6 +185,7 @@ fun DefaultScreenUI(
             ) {
 
                 content()
+
 
                 if (progressBarState is ProgressBarState.Loading) {
                     CircularProgressIndicator()

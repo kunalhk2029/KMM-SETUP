@@ -20,6 +20,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cc.referral.AppColors
+import com.cc.referral.business.domain.UIComponent
 import com.cc.referral.ui.components.GenericInputFieldComponent
 import com.cc.referral.ui.components.GenericRoundedCornerTextComponent
 import com.cc.referral.ui.components.WhatsAppUpdateToggleComponent
@@ -53,13 +56,24 @@ fun RegisterScreen(
     onNavEvents: (RegisterNavEvents) -> Unit
 ) {
 
+    LaunchedEffect(state.isOtpVerified) {
+        if (state.isOtpVerified == true) {
+            onEvents(RegisterEvents.ResetOtpData)
+            onNavEvents(RegisterNavEvents.NavigateToCards)
+        }
+    }
+
     DefaultScreenUI(
+        uiComponent = state.uiComponent.collectAsState().value,
         progressBarState = state.progressBarState.collectAsState().value,
         modalBottomSheetInfo = state.activeModalBottomSheetInfo.collectAsState().value,
         onModalBottomSheetClosed = {
             state.updateActiveModalBottomSheetInfo(null)
         }
     ) {
+
+        val keyboardController = LocalSoftwareKeyboardController.current
+
         Column(
             modifier = Modifier.fillMaxSize().background(AppColors.white)
                 .padding(horizontal = 25.dp)
@@ -106,6 +120,14 @@ fun RegisterScreen(
                 text = "Register with OTP",
                 textSize = 16.sp
             ) {
+                if (state.mobileNumber.value?.length != 10) {
+                    onEvents(
+                        RegisterEvents.UpdateUIComponent(
+                            UIComponent.SnackBar("Please enter a valid mobile number")
+                        )
+                    )
+                    return@GenericRoundedCornerTextComponent
+                }
                 onEvents(RegisterEvents.RegisterWithOTP)
             }
 
@@ -114,6 +136,7 @@ fun RegisterScreen(
             WhatsAppUpdateToggleComponent(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                keyboardController?.hide()
                 onEvents(RegisterEvents.UpdateWhatsAppUpdatesToggleState(it))
             }
 
@@ -128,8 +151,6 @@ fun RegisterScreen(
                 modifier = Modifier.padding(bottom = 35.dp),
                 lineHeight = 14.sp
             )
-
         }
     }
-
 }

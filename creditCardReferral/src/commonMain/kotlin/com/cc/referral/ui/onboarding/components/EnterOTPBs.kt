@@ -70,8 +70,10 @@ fun EnterOTPBs(
 
         BasicTextField(otpInput.value,
             onValueChange = {
-                if (it.lastOrNull()?.isDigit() == true)
-                    otpInput.value = it
+                if (it.lastOrNull()
+                        ?.isDigit() == false && it.length > otpInput.value.length
+                ) return@BasicTextField
+                otpInput.value = it
             },
             cursorBrush = SolidColor(AppColors.green15320077),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

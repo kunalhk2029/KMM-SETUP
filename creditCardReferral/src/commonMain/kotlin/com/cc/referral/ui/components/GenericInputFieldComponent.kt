@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,7 @@ fun GenericInputFieldComponent(
                 textStyle = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = AppColors.greyEFEFEF
+                    color = AppColors.black
                 ),
                 decorationBox = {
                     Row(
@@ -121,7 +122,8 @@ fun GenericInputFieldComponent(
 
                             Spacer(modifier = Modifier.width(5.dp))
                         }
-                        Box {
+                        Box() {
+
 
                             it()
 
@@ -131,8 +133,9 @@ fun GenericInputFieldComponent(
                                         text = it1,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = AppColors.greyEFEFEF,
-                                        maxLines = maxInputTextFieldLines ?: Int.MAX_VALUE
+                                        color = AppColors.black33,
+                                        maxLines = maxInputTextFieldLines ?: Int.MAX_VALUE,
+                                        textAlign = TextAlign.Center,
                                     )
                                 }
                             }

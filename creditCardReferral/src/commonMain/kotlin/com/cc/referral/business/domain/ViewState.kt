@@ -1,6 +1,12 @@
 package com.cc.referral.business.domain
 
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 
 interface ViewState {
@@ -26,6 +32,12 @@ open class ViewStateExt(
 
     override fun updateUiComponent(uiComponent: UIComponent) {
         this.uiComponent.value = uiComponent
+        if (uiComponent is UIComponent.SnackBar) {
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(4000L)
+                this@ViewStateExt.uiComponent.value = null
+            }
+        }
     }
 
     override fun updateProgressBarState(progressBarState: ProgressBarState) {

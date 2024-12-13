@@ -90,6 +90,7 @@ fun LoginScreen(
             text = "Log in with OTP",
             textSize = 16.sp
         ) {
+            onNavEvents(LoginNavEvents.NavigateToCards)
 
         }
 

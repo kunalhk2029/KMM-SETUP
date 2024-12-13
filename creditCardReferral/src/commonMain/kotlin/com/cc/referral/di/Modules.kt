@@ -6,6 +6,7 @@ import com.cc.referral.business.data.db.utils.DbRequestHandler
 import com.cc.referral.business.data.network.auth.AuthService
 import com.cc.referral.business.data.network.auth.models.AuthServiceImpl
 import com.cc.referral.business.data.network.utils.KtorHttpRequestHandler
+import com.cc.referral.ui.main.kyc.KYCViewModel
 import com.cc.referral.ui.onboarding.login.LoginViewModel
 import com.cc.referral.ui.onboarding.register.RegisterViewModel
 import kotlinx.serialization.json.Json
@@ -35,6 +36,7 @@ val sharedModule = module {
 
     viewModelOf(::LoginViewModel)
     viewModelOf(::RegisterViewModel)
+    viewModelOf(::KYCViewModel)
 }
 
 

@@ -29,7 +29,7 @@ class RegisterViewModel(
                             it
                         ).collect {
                             parseDataState(state.value, it) {
-                                state.value = state.value.copy(isOtpVerified = true)
+                                state.value = state.value.copy(isOtpSent = true)
                                 state.value.updateActiveModalBottomSheetInfo(ModalBottomSheetInfo.EnterOTP(
                                     state.value.mobileNumber.value ?: ""
                                 ) {
@@ -53,6 +53,15 @@ class RegisterViewModel(
                         }
                     }
                 }
+            }
+
+            is RegisterEvents.ResetOtpData -> {
+                state.value = state.value.copy(isOtpSent = false, isOtpVerified = false)
+            }
+
+            is RegisterEvents.UpdateUIComponent -> {
+                println("UIComponent event: ${event.uiComponent}")
+                state.value.updateUiComponent(event.uiComponent)
             }
 
             is RegisterEvents.UpdateWhatsAppUpdatesToggleState -> {
