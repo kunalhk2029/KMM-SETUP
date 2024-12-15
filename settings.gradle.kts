@@ -1,4 +1,4 @@
-rootProject.name = "CreditCardReferral"
+rootProject.name = "ReplaceProjectName"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -28,4 +28,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":creditCardReferral")
+include(":replaceAppName")
